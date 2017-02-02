@@ -1,0 +1,39 @@
+{
+  "name": "cultivator",
+  "version": "0.0.1",
+  "description": "A mongodb migration tool.",
+  "main": "lib/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/**"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agco/cultivator.git"
+  },
+  "keywords": [
+    "migration",
+    "mongodb",
+    "rollback",
+    "automatic"
+  ],
+  "dependencies": {
+    "mongodb-migrations": "https://github.com/agco/agco-mongodb-migrations#61f9c520f77f6cd6af73df75de6921dd1192bd85",
+    "bluebird": "3.4.7",
+    "lodash": "4.17.4",
+    "mongodb": "2.2.22",
+    "require-directory": "2.1.1"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "mocha": "3.2.0"
+  },
+  "author": "Stehpen Parker <shurakaisoft@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/agco/cultivator/issues"
+  },
+  "homepage": "https://github.com/agco/cultivator#readme"
+}
