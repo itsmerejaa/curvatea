@@ -2,12 +2,12 @@
   "name": "cultivator",
   "version": "0.0.1",
   "description": "A mongodb migration tool.",
-  "main": "lib/index.js",
+  "main": "lib/migrator.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test/**"
+    "test": "mocha test"
   },
   "repository": {
     "type": "git",
@@ -20,10 +20,10 @@
     "automatic"
   ],
   "dependencies": {
-    "mongodb-migrations": "https://github.com/agco/agco-mongodb-migrations#61f9c520f77f6cd6af73df75de6921dd1192bd85",
     "bluebird": "3.4.7",
     "lodash": "4.17.4",
     "mongodb": "2.2.22",
+    "mongodb-migrations": "https://github.com/agco/agco-mongodb-migrations#61f9c520f77f6cd6af73df75de6921dd1192bd85",
     "require-directory": "2.1.1"
   },
   "devDependencies": {

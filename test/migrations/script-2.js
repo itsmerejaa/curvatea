@@ -2,21 +2,24 @@
  * Test migrations file number 2. Used for testign the suitability of mongodb-migrations
  *
  */
-'use strict'
+'use strict';
 
 
 // dependencies
-const Promise = require('bluebird')
+const Promise = require('bluebird');
+
+const scriptLogger = require('../scriptExecLogUtil');
 
 
+//
 module.exports = {
   id: 2,
   up: () => {
-    console.log(`This is the ${module.exports.id} migration file UP running`)
+    scriptLogger.recordRun(2, 'up');
     return Promise.resolve()
   },
   down: () => {
-    console.log(`This is the ${module.exports.id} migration file DOWN running`)
+    scriptLogger.recordRun(2, 'down');
     return Promise.resolve()
   }
 }
