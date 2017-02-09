@@ -1,5 +1,5 @@
 /**
- * Test migrations script number 2. Used in test suite.
+ * Test migrations script number 5. Used in test suite.
  *
  */
 'use strict';
@@ -13,13 +13,13 @@ const scriptLogger = require('../scriptExecLogUtil');
 
 // Public API
 module.exports = {
-  id: 2,
+  id: 5,
   up: () => {
-    scriptLogger.recordRun(module.exports.id, 'up');
-    return Promise.resolve();
+    // for testing, this script is intentionally designed to fail
+    return Promise.reject('Intentional FAIL for testing reasons.');
   },
   down: () => {
     scriptLogger.recordRun(module.exports.id, 'down');
     return Promise.resolve();
   }
-}
+};

@@ -196,7 +196,7 @@ describe('The run() function', function () {
     });
 
     it('should default to using "./migrations"', function () {
-      const options = _createStandardOptions({ targetVersion: 5 });
+      const options = _createStandardOptions({ targetVersion: 7 });
 
       scriptLogger.reset();
       delete options.directory;
@@ -204,7 +204,7 @@ describe('The run() function', function () {
       .then((result) => {
         expect(typeof result).to.equal('object');
         expect(result.code).to.equal('MIGRATE');
-        expect(scriptLogger.wasRun(5, 'up')).to.equal(true);
+        expect(scriptLogger.wasRun(7, 'up')).to.equal(true);
         expect(scriptLogger.wasRun(1, 'up')).to.equal(false);  // crosscheck that the usual test scripts didn't run
       })
     });
@@ -295,10 +295,10 @@ describe('The run() function', function () {
         before(function () {
           return _emptyCollections([migrationsCollection])
           .then(() => {
-            return migrationsCollection.insertOne({ id: 3 })
+            return migrationsCollection.insertOne({ id: 5 })
           })
           .then(() => {
-            return _runWithAndSave(_createStandardOptions({ targetVersion: 4 }));
+            return _runWithAndSave(_createStandardOptions({ targetVersion: 6 }));
           });
         });
 
@@ -310,7 +310,7 @@ describe('The run() function', function () {
           return migrationsCollection.find({}).toArray()
           .then(docs => {
             expect(docs.length).to.equal(1);
-            expect(docs[0].id).to.equal(3);
+            expect(docs[0].id).to.equal(5);
           });
         });
 
@@ -436,15 +436,87 @@ describe('The run() function', function () {
 
     });
 
-    describe.skip('AND several forward migrations are required, the last of which fails', function () {
+    describe('AND several forward migrations are required, the last of which fails', function () {
+      before(function () {
+        scriptLogger.reset();
+        return _emptyCollections([migrationsCollection])
+        .then(() => {
+          return migrationsCollection.insertMany(_createChangeLogDocs([1, 2]))
+        })
+        .then(() => {
+          return _runWithAndSave(_createStandardOptions({ targetVersion: 5 }))
+        });
+      });
+
+      it('should return, as a rejected promise, an object with "code: MIGRATION_FAILED" property', function () {
+        expect(catchResult.error).to.equal('MIGRATION_FAILED');
+      });
+
+      it('should not record the last (failing) migration in the changelog collection', function () {
+        return migrationsCollection.find({ id: 5 }).toArray()
+        .then(docs => {
+          expect(docs.length).to.equal(0);
+        });
+      });
+
+      it('should not run the rollback for the failed migration script', function () {
+        expect(scriptLogger.wasRun(5, 'down')).to.equal(false);
+      });
+
+      it('should record the successful migration scripts in the changelog collection', function () {
+        return migrationsCollection.find({}).sort({ id: 1 }).toArray()
+        .then(logs => {
+          expect(logs.length).to.equal(4);
+          // 1 and 2 were seeded in this test and since the length is 4 we can assume they are there.
+          expect(logs[2].id).to.equal(3);
+          expect(logs[3].id).to.equal(4);
+        });
+      });
+
+      it('should run the successful migration scripts', function () {
+        // started at 2 and target was 5, so 3 and 4 should have run, but not 5 as it failed.
+        expect(scriptLogger.wasRun(3, 'up')).to.equal(true);
+        expect(scriptLogger.wasRun(4, 'up')).to.equal(true);
+      });
 
     });
 
-    describe.skip('AND several backward migrations are required, one of which fails', function () {
+    describe('AND several backward migrations are required, one of which fails', function () {
+      before(function () {
+        scriptLogger.reset();
+        return _emptyCollections([migrationsCollection])
+        .then(() => {
+          return migrationsCollection.insertMany(_createChangeLogDocs([1, 2, 3, 4, 5]));
+        })
+        .then(() => {
+          return _runWithAndSave(_createStandardOptions({ targetVersion: 3 }));
+        });
+      });
+
+      it('should return, as a rejected promise, an object with "code: ROLLBACK_FAILED" property', function () {
+        expect(catchResult.error).to.equal('ROLLBACK_FAILED');
+      });
+
+      it('should not remove the failing rollback from the changelog collection', function () {
+        return migrationsCollection.find({ id: 4 }).toArray()
+        .then(docs => {
+          expect(docs.length).to.equal(1);
+        });
+      });
+
+      it('should remove the successful rollbacks from the changelog collection', function () {
+        return migrationsCollection.find({ id: 5 }).toArray()
+        .then(docs => {
+          expect(docs.length).to.equal(0);
+        });
+      });
+
+      it('should run the successful rollback scripts', function () {
+        expect(scriptLogger.wasRun(5, 'down')).to.equal(true);
+      });
 
     })
+
   });
 
-
 });
-

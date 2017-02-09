@@ -1,5 +1,5 @@
 /**
- * Test migrations file. Used while testing the suitability of mongodb-migrations
+ * Test migrations script number 3. Used in test suite.
  *
  */
 'use strict'
@@ -7,18 +7,19 @@
 
 // dependencies
 const Promise = require('bluebird');
+
 const scriptLogger = require('../scriptExecLogUtil');
 
 
+// Public API
 module.exports = {
   id: 3,
   up: () => {
-    // use utility to record a script ran, so tests can verify
-    scriptLogger.recordRun(3, 'up');
-    return Promise.resolve()
+    scriptLogger.recordRun(module.exports.id, 'up');
+    return Promise.resolve();
   },
   down: () => {
-    scriptLogger.recordRun(3, 'down');
-    return Promise.resolve()
+    scriptLogger.recordRun(module.exports.id, 'down');
+    return Promise.resolve();
   }
 }
